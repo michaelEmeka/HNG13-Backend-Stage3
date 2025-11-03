@@ -99,6 +99,7 @@ async def a2a_endpoint(
                 kind="task",
             ),
         )
+        print(response.model_dump())
         return response
 
     except Exception as e:
