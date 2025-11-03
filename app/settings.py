@@ -8,6 +8,7 @@ from typing import List, Optional
 import redis.asyncio as redis
 import json
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -78,3 +79,12 @@ class SessionStore:
         messages = json.loads(messages_raw)
 
         return [A2AMessage(**m) for m in messages]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
