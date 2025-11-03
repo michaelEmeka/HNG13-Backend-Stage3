@@ -63,7 +63,7 @@ async def a2a_endpoint(
             taskId=task_id
         )
         # save to redis cache
-        await session_storage.save_messages(context_id, user_message_s)
+        ##await session_storage.save_messages(context_id, user_message_s)
 
         print(user_text_message)
         # Generate response from gemini LLM
@@ -82,7 +82,7 @@ async def a2a_endpoint(
         )
 
         # save to redis cache
-        await session_storage.save_messages(context_id, gemini_message)
+        ##await session_storage.save_messages(context_id, gemini_message)
 
         # print("taskid: ", str(user_message.taskId))
 
@@ -111,7 +111,8 @@ async def a2a_endpoint(
                     )
                 ],
                 history=(
-                    await session_storage.load_messages(context_id) if not None else []
+                    []
+                    #await session_storage.load_messages(context_id) if not None else []
                 ),
                 kind="task",
             )
