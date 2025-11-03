@@ -87,13 +87,15 @@ async def a2a_endpoint(
                 id=str(user_message.taskId),
                 contextId=str(context_id),
                 status=TaskStatus(
-                    state="completed",
+                    state="input-required",
                     timestamp=datetime.now(timezone.utc).strftime(
-                        "%Y-%M-%DT%H:%M:%S.%f"[:-3]+"Z"
+                        "%Y-%M-%DT%H:%M:%S.%f"[:-3] + "Z"
                     ),
                     message=gemini_message,
                 ),
-                history=await session_storage.load_messages(context_id) if not None else [],
+                history=(
+                    await session_storage.load_messages(context_id) if not None else []
+                ),
                 kind="task",
             ),
         )
