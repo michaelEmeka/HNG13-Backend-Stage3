@@ -1,20 +1,24 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union, Any, Literal
+from typing import List, Optional, Union, Any, Literal, Dict
 from datetime import datetime
 
 
 # ---------- COMMON PARTS ----------
 
 
-
 class DataPart(BaseModel):
-    kind: str = "dict"
+    kind: str = "data"
     data: dict
-
+    class Config:
+        exclude_none = True
 class MessagePart(BaseModel):
-    kind: str = "str"
-    text: str
-
+    kind: Literal["text", "data"]
+    text: Optional[str] = None
+    data: Optional[List[Dict[str, Any]]] = None
+    
+    class Config:
+        exclude_none = True
+        
 class Message(BaseModel):
     kind: str = "message"
     role: str  # "user" | "agent"
