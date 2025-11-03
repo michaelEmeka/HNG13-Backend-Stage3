@@ -3,7 +3,7 @@ from pydantic_ai import Agent
 from uuid import uuid4
 from dotenv import load_dotenv
 
-from .models import A2AMessage
+from .models import Message
 from typing import List, Optional
 import redis.asyncio as redis
 import json
@@ -15,7 +15,7 @@ load_dotenv()
 
 app = FastAPI()
 agent = Agent(
-    "google-gla:gemini-2.0-flash",
+    "google-gla:gemini-2.5-flash",
     instructions="""
     You are a useful, interesting, and wow-inducing tech facts provider. 
     Your purpose is to share unknown, hidden, or mind-blowing facts about people, inventions, or discoveries in the tech world — from both past and present events.
@@ -56,7 +56,7 @@ class SessionStore:
 
         # self.redis.ping
 
-    async def save_messages(self, context_id: str, message: A2AMessage):
+    async def save_messages(self, context_id: str, message: Message):
         key = f"convo: {context_id}"
 
         current_context_raw = await self.redis.get(key)
@@ -69,7 +69,7 @@ class SessionStore:
 
         await self.redis.set(key, json.dumps(current_context), ex=3600)  # 1 hour expiry
 
-    async def load_messages(self, context_id: str) -> Optional[List[A2AMessage]]:
+    async def load_messages(self, context_id: str) -> Optional[List[Message]]:
 
         messages_raw = await self.redis.get(f"convo: {context_id}")
 
@@ -78,7 +78,7 @@ class SessionStore:
 
         messages = json.loads(messages_raw)
 
-        return [A2AMessage(**m) for m in messages]
+        return [Message(**m) for m in messages]
 
 
 app.add_middleware(

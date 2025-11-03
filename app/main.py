@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 @app.post("/a2a/agent/techwowAgent", status_code=200)
 async def a2a_endpoint(
     request: Request, redis_client: redis.Redis = Depends(get_redis)
-) -> JSONRPCResponse:
+):
     """Main A2A endpoint"""
 
     session_storage = SessionStore(redis_client)
@@ -31,12 +31,13 @@ async def a2a_endpoint(
                 }
             )
 
-        rpc_request = JSONRPCRequest(**body)
+        rpc_request = A2ARequest(**body)
 
         if rpc_request.method == "message/send":
             messages = [rpc_request.params.message]
+            print(messages)
             config = rpc_request.params.configuration
-            context_id = "acd16ccd-2551-4b3c-9374-76008a2a14ca"
+            context_id = "acd16ccd-2551-4b3c-9324-76008a2a14ca"
         elif rpc_request.method == "execute":
             messages = rpc_request.params.message
             context_id = rpc_request.params.contextId
@@ -44,6 +45,7 @@ async def a2a_endpoint(
 
         # checks if there's any message, and retrieve last else return None
         user_message = messages[-1] if messages else None
+        task_id = user_message.taskId
 
         if not user_message:
             raise ValueError("No message sent from user!")
@@ -53,14 +55,15 @@ async def a2a_endpoint(
                 user_text_message = part.text.strip()
 
         # user sent a message, thus save to memory cache
-        user_message = A2AMessage(
+        user_message_s = Message(
             messageId=user_message.messageId,
             role="user",
             kind="message",
             parts=[MessagePart(kind="text", text=user_text_message)],
+            taskId=task_id
         )
         # save to redis cache
-        await session_storage.save_messages(context_id, user_message)
+        await session_storage.save_messages(context_id, user_message_s)
 
         print(user_text_message)
         # Generate response from gemini LLM
@@ -70,36 +73,53 @@ async def a2a_endpoint(
         print(gemini_response)
         print("yh")
 
-        gemini_message = A2AMessage(
+        gemini_message = Message(
             messageId=str(uuid4()),
             role="agent",
-            kind="message",
             parts=[MessagePart(kind="text", text=gemini_response)],
+            kind="message",
+            taskId = "None"
         )
 
         # save to redis cache
         await session_storage.save_messages(context_id, gemini_message)
 
-        response = JSONRPCResponse(
+        # print("taskid: ", str(user_message.taskId))
+
+        response = A2AResponse(
             jsonrpc="2.0",
             id=body.get("id"),
             result=TaskResult(
-                id=str(user_message.taskId),
+                id=str(task_id),
                 contextId=str(context_id),
-                status=TaskStatus(
-                    state="input-required",
+                status=Status(
+                    state="completed",
                     timestamp=datetime.now(timezone.utc).strftime(
                         "%Y-%M-%DT%H:%M:%S.%f"[:-3] + "Z"
                     ),
                     message=gemini_message,
+                    kind="message"
                 ),
+                artifacts=[
+                    Artifact(
+                        artifactId = str(uuid4()),
+                        name="subjectMatter",
+                        parts=[DataPart(
+                            kind="data",
+                            data={"heading": str(f"{gemini_response[:10]}...")}
+                        )]
+                    )
+                ],
                 history=(
                     await session_storage.load_messages(context_id) if not None else []
                 ),
                 kind="task",
-            ),
+            )
         )
-        print(response.model_dump())
+
+        response = response.model_dump(exclude_none=True, exclude_unset=True)
+        response["result"]["status"]["message"].pop("taskId")
+
         return response
 
     except Exception as e:
