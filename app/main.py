@@ -93,7 +93,7 @@ async def a2a_endpoint(
                 id=str(task_id),
                 contextId=str(context_id),
                 status=Status(
-                    state="completed",
+                    state="input-required",
                     timestamp=datetime.now(timezone.utc).strftime(
                         "%Y-%M-%DT%H:%M:%S.%f"[:-3] + "Z"
                     ),
