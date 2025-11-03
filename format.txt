@@ -1,0 +1,68 @@
+##REQUEST
+
+{
+  "jsonrpc": "2.0",
+  "id": "request-123",
+  "method": "message/send",
+  "params": {
+    "message": {
+      "kind": "message",
+      "role": "user",
+      "parts": [
+        {
+          "kind": "text",
+          "text": "What's the weather in Lagos?"
+        }
+      ],
+      "messageId": "msg-001",
+      "taskId": "task-001"
+    },
+    "configuration": {
+      "blocking": true
+    }
+  }
+}
+
+
+##RESPONSE
+{
+  "jsonrpc": "2.0",
+  "id": "request-123",
+  "result": {
+    "id": "task-001",
+    "contextId": "ctx-uuid",
+    "status": {
+      "state": "completed",
+      "timestamp": "2025-10-20T10:30:00.000Z",
+      "message": {
+        "messageId": "msg-002",
+        "role": "agent",
+        "parts": [
+          {
+            "kind": "text",
+            "text": "The current weather in Lagos is 29°C with thunderstorms."
+          }
+        ],
+        "kind": "message"
+      }
+    },
+    "artifacts": [
+      {
+        "artifactId": "artifact-uuid",
+        "name": "weatherData",
+        "parts": [
+          {
+            "kind": "data",
+            "data": {
+              "temperature": 29.1,
+              "humidity": 85,
+              "conditions": "Thunderstorm"
+            }
+          }
+        ]
+      }
+    ],
+    "history": [...],
+    "kind": "task"
+  }
+}
