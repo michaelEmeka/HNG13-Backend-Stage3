@@ -37,11 +37,8 @@ async def a2a_endpoint(
             messages = [rpc_request.params.message]
             print(messages)
             config = rpc_request.params.configuration
-            context_id = "acd16ccd-2552-4b3c-9324-76008a2a14ca"
-        elif rpc_request.method == "execute":
-            messages = rpc_request.params.message
-            context_id = rpc_request.params.contextId
-            task_id = rpc_request.params.taskId
+            context_id = uuid4()
+        
 
         # checks if there's any message, and retrieve last else return None
         user_message = messages[-1] if messages else None
@@ -70,6 +67,7 @@ async def a2a_endpoint(
         gemini_response = await agent.run(user_text_message)
 
         gemini_response = str(gemini_response.output)
+        
         print(gemini_response)
         print("yh")
 
