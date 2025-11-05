@@ -1,6 +1,6 @@
 # TechWow AI Agent API
 
-TechWow is an insightful and educative AI agent that gives interesting fun facts in the world of Tech. It’s a fairly simple agent as the project task requires.
+TechWow is an insightful and educative AI agent that gives interesting fun facts in the world of Tech. It can also gives contributions of certain persons, innovations, and their impact in the evolution of modern day technology, as well as make suggestions if the user is uncertain on what he/she wants.
 
 A FastAPI-based backend service that provides interesting and wow-inducing tech facts through an A2A (Agent-to-Agent) interface. The service uses Google's Gemini 2.5 Flash model to generate engaging responses about technology, inventions, and discoveries.
 
