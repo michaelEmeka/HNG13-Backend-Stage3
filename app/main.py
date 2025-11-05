@@ -38,7 +38,6 @@ async def a2a_endpoint(
             print(messages)
             config = rpc_request.params.configuration
             context_id = uuid4()
-        
 
         # checks if there's any message, and retrieve last else return None
         user_message = messages[-1] if messages else None
@@ -67,7 +66,7 @@ async def a2a_endpoint(
         gemini_response = await agent.run(user_text_message)
 
         gemini_response = str(gemini_response.output)
-        
+
         print(gemini_response)
         print("yh")
 
@@ -94,7 +93,8 @@ async def a2a_endpoint(
                     state="input-required",
                     timestamp=datetime.now(timezone.utc).strftime(
                         "%Y-%m-%dT%H:%M:%S.%f"
-                    )[:-3]+ "Z",
+                    )[:-3]
+                    + "Z",
                     message=gemini_message,
                     kind="message",
                 ),
@@ -105,7 +105,14 @@ async def a2a_endpoint(
                         parts=[
                             DataPart(
                                 kind="data",
-                                data={"heading": str(f"{gemini_response[:10]}...")},
+                                data={
+                                    "type": "fact",
+                                    "heading": str(
+                                        f"{gemini_response.split('.')[0][:60].strip()}..."
+                                    ),
+                                    "description": str(gemini_response.strip()),
+                                    "category": "General Tech",
+                                },
                             )
                         ],
                     )
@@ -118,7 +125,7 @@ async def a2a_endpoint(
         )
 
         response = response.model_dump(exclude_none=True, exclude_unset=True)
-        #response["result"]["status"]["message"].pop("taskId")
+        # response["result"]["status"]["message"].pop("taskId")
 
         return response
 
