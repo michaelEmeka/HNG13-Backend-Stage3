@@ -76,7 +76,7 @@ async def a2a_endpoint(
             role="agent",
             parts=[MessagePart(kind="text", text=gemini_response)],
             kind="message",
-            taskId = task_id
+            taskId=task_id
         )
 
         # save to redis cache
