@@ -42,7 +42,7 @@ async def a2a_endpoint(
 
         # checks if there's any message, and retrieve last else return None
         user_message = messages[-1] if messages else None
-        task_id = user_message.taskId
+        task_id = uuid4() #user_message.taskId
 
         if not user_message:
             raise ValueError("No message sent from user!")
@@ -118,7 +118,7 @@ async def a2a_endpoint(
         )
 
         response = response.model_dump(exclude_none=True, exclude_unset=True)
-        response["result"]["status"]["message"].pop("taskId")
+        #response["result"]["status"]["message"].pop("taskId")
 
         return response
 
