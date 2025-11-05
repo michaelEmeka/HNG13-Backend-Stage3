@@ -42,7 +42,7 @@ async def a2a_endpoint(
 
         # checks if there's any message, and retrieve last else return None
         user_message = messages[-1] if messages else None
-        task_id = uuid4() #user_message.taskId
+        task_id = str(uuid4()) #user_message.taskId
 
         if not user_message:
             raise ValueError("No message sent from user!")
