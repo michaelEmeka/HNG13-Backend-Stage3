@@ -37,7 +37,7 @@ async def a2a_endpoint(
             messages = [rpc_request.params.message]
             print(messages)
             config = rpc_request.params.configuration
-            context_id = "acd16ccd-2551-4b3c-9324-76008a2a14ca"
+            context_id = "acd16ccd-2552-4b3c-9324-76008a2a14ca"
         elif rpc_request.method == "execute":
             messages = rpc_request.params.message
             context_id = rpc_request.params.contextId
@@ -63,7 +63,7 @@ async def a2a_endpoint(
             taskId=task_id
         )
         # save to redis cache
-        ##await session_storage.save_messages(context_id, user_message_s)
+        await session_storage.save_messages(context_id, user_message_s)
 
         print(user_text_message)
         # Generate response from gemini LLM
@@ -78,11 +78,11 @@ async def a2a_endpoint(
             role="agent",
             parts=[MessagePart(kind="text", text=gemini_response)],
             kind="message",
-            taskId = "None"
+            taskId = task_id
         )
 
         # save to redis cache
-        ##await session_storage.save_messages(context_id, gemini_message)
+        await session_storage.save_messages(context_id, gemini_message)
 
         # print("taskid: ", str(user_message.taskId))
 
@@ -95,27 +95,28 @@ async def a2a_endpoint(
                 status=Status(
                     state="input-required",
                     timestamp=datetime.now(timezone.utc).strftime(
-                        "%Y-%M-%DT%H:%M:%S.%f"[:-3] + "Z"
-                    ),
+                        "%Y-%m-%dT%H:%M:%S.%f"
+                    )[:-3]+ "Z",
                     message=gemini_message,
-                    kind="message"
+                    kind="message",
                 ),
                 artifacts=[
                     Artifact(
-                        artifactId = str(uuid4()),
+                        artifactId=str(uuid4()),
                         name="subjectMatter",
-                        parts=[DataPart(
-                            kind="data",
-                            data={"heading": str(f"{gemini_response[:10]}...")}
-                        )]
+                        parts=[
+                            DataPart(
+                                kind="data",
+                                data={"heading": str(f"{gemini_response[:10]}...")},
+                            )
+                        ],
                     )
                 ],
                 history=(
-                    []
-                    #await session_storage.load_messages(context_id) if not None else []
+                    await session_storage.load_messages(context_id) if not None else []
                 ),
                 kind="task",
-            )
+            ),
         )
 
         response = response.model_dump(exclude_none=True, exclude_unset=True)
